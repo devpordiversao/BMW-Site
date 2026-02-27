@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW - A História Completa | Desde 1916</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Intro Cinematic com Vídeo */
+        .cinematic-intro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 9999;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+        
+        .bmw-video {
+            width: 960px;
+            height: 540px;
+            max-width: 100%;
+            max-height: 100vh;
+            object-fit: contain;
+            filter: contrast(1.1) brightness(0.9);
+        }
+        
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.3) 0%, 
+                rgba(0,0,0,0) 30%, 
+                rgba(0,0,0,0) 70%, 
+                rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+        }
+        
+        .intro-title {
+            position: absolute;
+            font-size: 6rem;
+            font-weight: 900;
+            letter-spacing: 1rem;
+            opacity: 0;
+            animation: titleReveal 3s ease-in-out forwards;
+            animation-delay: 5s;
+            background: linear-gradient(45deg, #fff, #888, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            z-index: 10;
+        }
+        
+        @keyframes titleReveal {
+            0% { opacity: 0; transform: scale(0.8) translateY(30px); }
+            30% { opacity: 1; transform: scale(1) translateY(0); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.2) translateY(-50px); }
+        }
+        
+        .skip-intro {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            cursor: pointer;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+        
+        .skip-intro:hover {
+            background: rgba(0,102,177,0.5);
+            border-color: #0066b1;
+        }
+        
+        /* Main Content */
+        .main-content {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .main-content.visible {
+            opacity: 1;
+        }
+        
+        /* BMW Blue accent */
+        .bmw-blue { color: #0066b1; }
+        .bg-bmw-blue { background-color: #0066b1; }
+        
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            padding: 4rem 0;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #0066b1, #00d4ff, #0066b1);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin: 4rem 0;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+        
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 50%;
+            padding-right: 3rem;
+            text-align: right;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 50%;
+            padding-left: 3rem;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: #0066b1;
+            border: 4px solid #0a0a0a;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(0,102,177,0.5);
+        }
+        
+        /* Car Cards */
+        .car-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border: 1px solid #333;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .car-card:hover {
+            transform: translateY(-10px);
+            border-color: #0066b1;
+            box-shadow: 0 20px 40px rgba(0,102,177,0.3);
+        }
+        
+        .car-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .car-card:hover::before {
+            left: 100%;
+        }
+        
+        .car-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .car-card:hover .car-image {
+            transform: scale(1.05);
+        }
+        
+        /* Grid Layouts */
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+        
+        /* Navigation */
+        .nav-fixed {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid #333;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-fixed.visible {
+            transform: translateY(0);
+        }
+        
+        /* Text animations */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .reveal-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0066b1;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0088ff;
+        }
+        
+        /* Glow effects */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(0,102,177,0.5), 0 0 20px rgba(0,102,177,0.3);
+        }
+        
+        .section-title {
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #0066b1, transparent);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .intro-title {
+                font-size: 3rem;
+                letter-spacing: 0.5rem;
+            }
+            .bmw-video {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cinematic Intro com Vídeo -->
+    <div class="cinematic-intro" id="intro">
+        <div class="video-container">
+            <video class="bmw-video" autoplay muted playsinline id="bmwVideo">
+                <source src="88481-606110665_small.mp4" type="video/mp4">
+                Seu navegador não suporta vídeos.
+            </video>
+            <div class="video-overlay"></div>
+            <h1 class="intro-title font-orbitron">BMW</h1>
+            <button class="skip-intro" onclick="skipIntro()">Pular Intro</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-fixed" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="font-orbitron text-2xl font-bold bmw-blue">BMW</div>
+            <div class="hidden md:flex space-x-8 text-sm uppercase tracking-wider">
+                <a href="#historia" class="hover:text-blue-400 transition">História</a>
+                <a href="#classicos" class="hover:text-blue-400 transition">Clássicos</a>
+                <a href="#modernos" class="hover:text-blue-400 transition">Modernos</a>
+                <a href="#eletricos" class="hover:text-blue-400 transition">Elétricos</a>
+                <a href="#m-series" class="hover:text-blue-400 transition">M Series</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        
+        <!-- Hero Section -->
+        <section class="min-h-screen flex items-center justify-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-blue-900/20 to-black"></div>
+            <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
+                <h1 class="font-orbitron text-6xl md:text-8xl font-black mb-6 glow-text reveal-text">
+                    SHEER DRIVING<br><span class="bmw-blue">PLEASURE</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-400 mb-8 reveal-text" style="transition-delay: 0.2s">
+                    A história completa da Bayerische Motoren Werke<br>
+                    Desde 1916 até os dias de hoje
+                </p>
+                <div class="flex justify-center gap-4 reveal-text" style="transition-delay: 0.4s">
+                    <button onclick="document.getElementById('historia').scrollIntoView({behavior: 'smooth'})" 
+                            class="px-8 py-4 bg-bmw-blue hover:bg-blue-600 rounded-full font-bold transition transform hover:scale-105">
+                        Explorar História
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="historia" class="py-20 px-6 max-w-7xl mx-auto">
+            <h2 class="section-title font-orbitron reveal-text">A Fundação</h2>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center mb-20">
+                <div class="reveal-text">
+                    <h3 class="text-3xl font-bold mb-6 bmw-blue">1916 - O Início</h3>
+                    <p class="text-gray-300 leading-relaxed mb-4">
+                        A <strong>Bayerische Motoren Werke AG (BMW)</strong> foi fundada em 7 de março de 1916 em Munique, Alemanha, 
+                        por <strong>Karl Rapp</strong> e <strong>Gustav Otto</strong>. Inicialmente, a empresa fabricava motores de 
+                        aeronaves durante a Primeira Guerra Mundial, refletida no logotipo que representa uma hélice de avião em 
+                        movimento contra um céu azul.
+                    </p>
+                    <p class="text-gray-300 leading-relaxed mb-4">
+                        Após o Tratado de Versalhes proibir a produção de motores aeronáuticos na Alemanha, a BMW diversificou-se 
+                        para motocicletas em 1923 e finalmente para automóveis em 1928, com a aquisição da Fábrica de Automóveis 
+                        Eisenach.
+                    </p>
+                    <div class="mt-6 p-6 bg-gray-900 rounded-lg border-l-4 border-blue-600">
+                        <h4 class="font-bold text-lg mb-2">Sede Mundial</h4>
+                        <p class="text-gray-400">Munique, Baviera, Alemanha</p>
+                        <p class="text-gray-400">CEO Atual: Oliver Zipse</p>
+                        <p class="text-gray-400">Empresa de Capital Aberto (BMW Group)</p>
+                    </div>
+                </div>
+                <div class="reveal-text">
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.classicdriver.com/e9284d9bdbf8bd1b9da00850900626e3e4a37add.jpeg" 
+                             alt="BMW E34 M5" class="w-full h-auto transform hover:scale-105 transition duration-700">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                            <p class="text-sm text-gray-300">Sede da BMW em Munique</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="text-2xl font-bold bmw-blue mb-2">1936 - BMW 328</h3>
+                        <p class="text-gray-400">O primeiro grande sucesso esportivo da BMW. Venceu inúmeras corridas e estabeleceu 
+                        a reputação da marca como fabricante de carros esportivos de alto desempenho.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="text-2xl font-bold bmw-blue mb-2">1956 - BMW 507</h3>
+                        <p class="text-gray-400">Roadster icônico projetado por Albrecht von Goertz. Apenas 252 unidades foram 
+                        produzidas, tornando-se um dos carros mais valiosos da história da BMW.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="text-2xl font-bold bmw-blue mb-2">1962 - Neue Klasse</h3>
+                        <p class="text-gray-400">A "Nova Classe" salvou a BMW da falência. O BMW 1500 estabeleceu o conceito de 
+                        sedan esportivo de luxo que define a marca até hoje.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="text-2xl font-bold bmw-blue mb-2">1972 - BMW Motorsport GmbH</h3>
+                        <p class="text-gray-400">Fundação da divisão de motorsport que daria origem à lendária série M, começando 
+                        com o 3.0 CSL "Batmobile".</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="text-2xl font-bold bmw-blue mb-2">1978 - BMW M1</h3>
+                        <p class="text-gray-400">O primeiro supercarro da BMW, projetado por Giorgetto Giugiaro. O único BMW de 
+                        motor central já produzido em série.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Classic Models -->
+        <section id="classicos" class="py-20 bg-gray-900/50">
+            <div class="max-w-7xl mx-auto px-6">
+                <h2 class="section-title font-orbitron reveal-text">Modelos Clássicos</h2>
+                <p class="text-gray-400 text-xl mb-12 max-w-3xl reveal-text">
+                    Os carros que definiram a legenda da BMW e estabeleceram o padrão para performance e luxo alemão.
+                </p>
+
+                <div class="models-grid">
+                    <!-- BMW 328 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/car-images.bauersecure.com/aeb3e23e9081e92df6296ef31986648d183eee11.jpg" 
+                             alt="BMW 328 1936" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW 328 <span class="text-sm text-gray-500">1936-1940</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">O carro que estabeleceu a BMW como fabricante de carros esportivos. 
+                            Motor 2.0L 6 cilindros em linha com 80cv. Vencedor da Mille Miglia.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">6 Cilindros</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">Roadster</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BMW 507 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/upload.wikimedia.org/51359e6c0efe680447cf83683525ea07cc79cf57.jpg" 
+                             alt="BMW 507" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW 507 <span class="text-sm text-gray-500">1956-1959</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Roadster de alumínio com motor V8 3.2L. Elvis Presley teve um. 
+                            Apenas 252 unidades produzidas. Hoje vale milhões.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">V8 3.2L</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">150cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BMW 2002 Turbo -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/image-cdn.hypb.st/faebfb8e2da72486876e5873640e3c5bbc342386.jpg" 
+                             alt="BMW 2002 Turbo" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW 2002 Turbo <span class="text-sm text-gray-500">1973-1975</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Primeiro carro de produção europeu com turbo. Motor 2.0L com 170cv. 
+                            Ícone da divisão Motorsport antes mesmo da existência da M.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">Turbo</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">170cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3.0 CSL -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/upload.wikimedia.org/059222fefad11b11f27d9a8318c7df14aebbe530.jpg" 
+                             alt="BMW 3.0 CSL" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW 3.0 CSL <span class="text-sm text-gray-500">1971-1975</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">"Batmobile". Versão leve para homologação em corridas. Carroceria 
+                            de alumínio e aerodinâmica extrema. Ícone absoluto da motorsport.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">Coupe Leve</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">206cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- M1 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/assets.dyler.com/73b3e981f4a95d9283fa6c6c0f86f7a0413e93ea.jpg" 
+                             alt="BMW M1" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW M1 <span class="text-sm text-gray-500">1978-1981</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Supercarro de motor central 3.5L 6 cilindros com 277cv. 
+                            Projetado por Giugiaro. Apenas 453 unidades. O único BMW de motor central.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">Motor Central</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">277cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- E30 M3 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.bmw-m.com/4e84274c69b18bc46273e93e3c9b45a6f6e906c0.jpg" 
+                             alt="BMW E30 M3" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW M3 E30 <span class="text-sm text-gray-500">1986-1991</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">O primeiro M3. Criado para homologação no DTM. Motor 2.3L 4 cilindros 
+                            com 200cv. Considerado o melhor M3 de todos os tempos por puristas.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">DTM Champion</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">200cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- E39 M5 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/images.squarespace-cdn.com/cfd06382e507b83099eecaf3a505ce42d2df4864.jpg" 
+                             alt="BMW E39 M5" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW M5 E39 <span class="text-sm text-gray-500">1998-2003</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Considerado o melhor sedan esportivo já feito. V8 4.9L com 400cv. 
+                            Som de F1. O equilíbrio perfeito entre luxo e performance.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">V8 4.9L</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">400cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Z8 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/cdn.rmsothebys.com/ab3c660df22fb053ca63683a904578af8638cb67.webp" 
+                             alt="BMW Z8" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW Z8 <span class="text-sm text-gray-500">2000-2003</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Homenagem ao 507. Motor V8 4.9L do M5 E39 com 400cv. 
+                            Carroceria de alumínio. Design atemporal por Henrik Fisker.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">Alumínio</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">400cv</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modern Models -->
+        <section id="modernos" class="py-20">
+            <div class="max-w-7xl mx-auto px-6">
+                <h2 class="section-title font-orbitron reveal-text">Era Moderna</h2>
+                <p class="text-gray-400 text-xl mb-12 max-w-3xl reveal-text">
+                    Tecnologia de ponta, motores biturbo e o início da era híbrida e elétrica mantendo a essência 
+                    "Sheer Driving Pleasure".
+                </p>
+
+                <div class="models-grid">
+                    <!-- i8 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/platform.theverge.com/a5a4b1d62cc52437c09feff245bd9795aba8b446.jpg" 
+                             alt="BMW i8" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW i8 <span class="text-sm text-gray-500">2014-2020</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Supercarro híbrido plug-in com motor 1.5L 3 cilindros turbo + 
+                            motor elétrico. Carroceria de fibra de carbono. 0-100 em 4.4s.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-green-900/50 rounded-full">Híbrido</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">362cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- M4 CSL -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/2cf6c88a37baae48c3de41741e35f68227ff9db5.jpg" 
+                             alt="BMW M4 CSL" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW M4 CSL <span class="text-sm text-gray-500">2022-2023</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Edição limitada de 1000 unidades. 100kg mais leve que o M4 normal. 
+                            Motor 3.0L biturbo com 550cv. Foco total em pista.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-red-900/50 rounded-full">Edição Limitada</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">550cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- M5 F90 -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/mngauto.lv/20bc8187d765d5aee1f3c1bb49cb802c2bedf2da.jpeg" 
+                             alt="BMW M5 F90" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW M5 Competition <span class="text-sm text-gray-500">2018-2023</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Sedan supersônico com V8 4.4L biturbo e 625cv. Tração integral 
+                            M xDrive. 0-100 em 3.3s. O sedan mais rápido da Nürburgring.</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">V8 Biturbo</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">625cv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Z4 M40i -->
+                    <div class="car-card reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/bd99e884eeec1a19d0a2c9f337e17e95c8a42a42.jpg" 
+                             alt="BMW Z4 M40i" class="car-image">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">BMW Z4 M40i <span class="text-sm text-gray-500">2019-Atual</span></h3>
+                            <p class="text-gray-400 text-sm mb-4">Roadster com motor 3.0L 6 cilindros em linha biturbo (B58) com 
+                            382cv. Tração traseira. Câmbio manual disponível (2025).</p>
+                            <div class="flex gap-2 text-xs">
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">6 Cilindros</span>
+                                <span class="px-3 py-1 bg-blue-900/50 rounded-full">382cv</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Electric Section -->
+        <section id="eletricos" class="py-20 bg-gradient-to-b from-gray-900 to-black">
+            <div class="max-w-7xl mx-auto px-6">
+                <h2 class="section-title font-orbitron reveal-text">Era Elétrica</h2>
+                
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="reveal-text">
+                        <h3 class="text-4xl font-bold mb-6 bmw-blue">BMW iX</h3>
+                        <p class="text-gray-300 text-lg mb-6">
+                            O SUV elétrico de luxo que redefine o futuro da mobilidade. Com 500km de autonomia, 
+                            516cv na versão M60 e tecnologia de ponta, o iX representa a nova era da BMW.
+                        </p>
+                        <ul class="space-y-3 text-gray-400">
+                            <li class="flex items-center gap-3">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                Autonomia de até 630km (xDrive50)
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                Aceleração 0-100 em 3.8s (M60)
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                Carregamento ultrarrápido 195kW
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                Interior com materiais sustentáveis
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="reveal-text">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.lease-electric.com/94ca76ea851629f12823db8307e09ee245c13f68.jpg" 
+                             alt="BMW iX" class="rounded-2xl shadow-2xl shadow-blue-900/20">
+                    </div>
+                </div>
+
+                <div class="mt-20 grid md:grid-cols-3 gap-8">
+                    <div class="bg-gray-900 p-6 rounded-xl border border-gray-800 reveal-text">
+                        <h4 class="text-xl font-bold mb-3 bmw-blue">i4</h4>
+                        <p class="text-gray-400 text-sm">Gran Coupe elétrico com até 544cv (M50). Autonomia de 590km. 
+                        Design dinâmico mantendo a essência BMW.</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-xl border border-gray-800 reveal-text">
+                        <h4 class="text-xl font-bold mb-3 bmw-blue">i5</h4>
+                        <p class="text-gray-400 text-sm">Série 5 totalmente elétrica. Até 601cv na versão M60. 
+                        Tecnologia de última geração com iDrive 8.5.</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-xl border border-gray-800 reveal-text">
+                        <h4 class="text-xl font-bold mb-3 bmw-blue">i7</h4>
+                        <p class="text-gray-400 text-sm">O ápice do luxo elétrico. Limousine com 650cv, tela de 31" 
+                        no banco traseiro e autonomia de 625km.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- M Series Section -->
+        <section id="m-series" class="py-20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-red-900/20"></div>
+            <div class="max-w-7xl mx-auto px-6 relative z-10">
+                <h2 class="section-title font-orbitron reveal-text">M Power</h2>
+                <p class="text-gray-400 text-xl mb-12 max-w-3xl reveal-text">
+                    A divisão Motorsport da BMW representa o ápice da engenharia de performance. 
+                    Desde 1972, criando os carros mais desejados do mundo.
+                </p>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border border-gray-800 hover:border-blue-500 transition reveal-text">
+                        <h3 class="text-2xl font-bold mb-2">M2</h3>
+                        <p class="text-sm text-gray-400 mb-4">O último M com tração traseira pura. Motor S58 3.0L com 460cv. 
+                        O sucessor espiritual do E30 M3.</p>
+                        <span class="text-blue-400 font-bold">A partir de $66.075</span>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border border-gray-800 hover:border-blue-500 transition reveal-text">
+                        <h3 class="text-2xl font-bold mb-2">M3</h3>
+                        <p class="text-sm text-gray-400 mb-4">O ícone absoluto. S58 3.0L biturbo com 523cv (Competition xDrive). 
+                        Disponível com manual de 6 marchas.</p>
+                        <span class="text-blue-400 font-bold">A partir de $77.175</span>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border border-gray-800 hover:border-blue-500 transition reveal-text">
+                        <h3 class="text-2xl font-bold mb-2">M4</h3>
+                        <p class="text-sm text-gray-400 mb-4">Coupé e Conversível com até 543cv (CS). Tração traseira ou integral. 
+                        O esportivo definitivo.</p>
+                        <span class="text-blue-400 font-bold">A partir de $78.100</span>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border border-gray-800 hover:border-blue-500 transition reveal-text">
+                        <h3 class="text-2xl font-bold mb-2">M5</h3>
+                        <p class="text-sm text-gray-400 mb-4">Novo 2025 com hibridização. V8 4.4L + motor elétrico = 717cv. 
+                        0-100 em 3.4s. Pela primeira vez, Touring nos EUA.</p>
+                        <span class="text-blue-400 font-bold">A partir de $120.675</span>
+                    </div>
+                </div>
+
+                <div class="mt-12 p-8 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-2xl border border-blue-500/30 reveal-text">
+                    <h3 class="text-3xl font-bold mb-4">BMW XM 2024</h3>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <p class="text-gray-300 mb-4">
+                                O primeiro M híbrido plug-in dedicado desde o M1. Motor V8 4.4L biturbo combinado 
+                                com um motor elétrico para entregar 644cv (Label Red: 738cv). SUV de alta performance 
+                                com luxo extremo.
+                            </p>
+                            <ul class="space-y-2 text-sm text-gray-400">
+                                <li>• 0-100 km/h em 4.3 segundos</li>
+                                <li>• Autonomia elétrica de 88km</li>
+                                <li>• Preço: A partir de $159.000</li>
+                            </ul>
+                        </div>
+                        <img src="https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/c9f3033e59655239f694950d617437570ec333fa.jpg" 
+                             alt="BMW XM" class="rounded-lg shadow-2xl">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-black border-t border-gray-800 py-12">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <h2 class="font-orbitron text-4xl font-bold mb-6 bmw-blue">BMW</h2>
+                <p class="text-gray-500 mb-8">Bayerische Motoren Werke AG • Desde 1916</p>
+                <div class="flex justify-center gap-6 text-sm text-gray-600">
+                    <span>Munique, Alemanha</span>
+                    <span>•</span>
+                    <span>Oliver Zipse, CEO</span>
+                    <span>•</span>
+                    <span>Sheer Driving Pleasure</span>
+                </div>
+                <p class="mt-8 text-xs text-gray-700">
+                    Site criado para fins educacionais. Todas as imagens são propriedade da BMW Group.<br>
+                    © 2024 BMW Fan Page. Não afiliado à BMW Group.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Video Intro Logic
+        const video = document.getElementById('bmwVideo');
+        const intro = document.getElementById('intro');
+        const mainContent = document.getElementById('mainContent');
+        
+        // When video ends
+        video.addEventListener('ended', () => {
+            endIntro();
+        });
+        
+        // Skip intro function
+        function skipIntro() {
+            video.pause();
+            endIntro();
+        }
+        
+        function endIntro() {
+            intro.style.opacity = '0';
+            intro.style.transition = 'opacity 1s ease';
+            setTimeout(() => {
+                intro.style.display = 'none';
+                mainContent.classList.add('visible');
+                document.body.style.overflow = 'auto';
+            }, 1000);
+        }
+        
+        // Prevent scrolling during intro
+        document.body.style.overflow = 'hidden';
+        
+        // Navbar visibility
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.classList.add('visible');
+            } else {
+                navbar.classList.remove('visible');
+            }
+            lastScroll = currentScroll;
+        });
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all reveal elements
+        document.querySelectorAll('.reveal-text, .timeline-item').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
